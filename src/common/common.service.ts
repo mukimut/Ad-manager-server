@@ -1,7 +1,7 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { readdir, mkdir } from 'fs/promises';
-import { Cache } from 'cache-manager';
+import {exec} from 'child_process'
 const approot: string = require('app-root-path').toString();
 const projectFolderName = 'ad_projects';
 
@@ -33,8 +33,8 @@ export class CommonService {
         return valid;
     }
 
-    folderContents(): Promise<string[]> {
-        const folderPath = path.join(approot, projectFolderName);
+    folderContents(projectName: string = ''): Promise<string[]> {
+        const folderPath = path.join(approot, projectFolderName, projectName);
         return readdir(folderPath);
     }
 
@@ -50,11 +50,20 @@ export class CommonService {
         });
     }
 
-    pathToProjectFolder(projectName: string, filename: string): string {
-        return path.join(approot, projectFolderName, projectName, filename);
+    pathToProjectFolder(projectName: string): string {
+        return path.join(approot, projectFolderName, projectName, projectName);
+    }
+
+    unzip(project: string) {
+        if(process.platform == 'win32') {
+            exec('tar -xf ./' + project + '/' + project + '.zip', (e, out: String, stderror: String) => {
+                console.log(out);
+                console.log(stderror);
+            })
+        } else {
+            console.error('Unix not implemented yet')
+        }
     }
 }
 
-export interface CommonResponse {
-    success: boolean, message: string
-}
+export interface CommonResponse {success: boolean, message: string}
