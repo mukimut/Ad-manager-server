@@ -56,7 +56,10 @@ export class CommonService {
 
     unzip(project: string) {
         if(process.platform == 'win32') {
-            exec('tar -xf ./' + project + '/' + project + '.zip', (e, out: String, stderror: String) => {
+            const zipPath = path.join(approot, projectFolderName, project, project + '.zip');
+            const command = 'tar -xf "' + zipPath + '"';
+            console.log(command);
+            exec(command, (e, out: String, stderror: String) => {
                 console.log(out);
                 console.log(stderror);
             })

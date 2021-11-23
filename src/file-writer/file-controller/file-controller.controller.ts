@@ -35,51 +35,28 @@ export class FileControllerController {
     }
 
     @Post('/uploadzip/:token')
-    async getZip(@Req() req: any, @Res() res: Response){
-        const projectName: string = this.uploadQue.find((item: UploadQue) => {
-            return item.token = req.param.tokens
+    getZip(@Req() req: any, @Res() res: Response){
+        let removeIndex: number;
+        
+        const projectName: string = this.uploadQue.find((item: UploadQue, index: number) => {
+            removeIndex = index;
+            return item.token == req.params.token;
         }).project;
+        this.uploadQue.splice(removeIndex, 1);
 
-
-        console.log(projectName);
         req.pipe(req.busboy);
-        let fileToWrite: Stream, writeStream: WriteStream, fail = true;
+        let fail = true;
 
         req.busboy.on('file', (fieldname: string, file: Stream, filename: string) => {
-            
-            fileToWrite = file;
-            console.log(filename);
-            // const fsstream = createWriteStream(this.common.pathToProjectFolder('samin') + '.zip');
-            /*file.pipe(fsstream);
+            const fsstream = createWriteStream(this.common.pathToProjectFolder(projectName) + '.zip');
+
+            file.pipe(fsstream);
             fsstream.on('close', () => {
+                this.common.unzip(projectName);
                 fail = false;
                 res.send({success: true, message: 'Writing Done'});
             });
-
-            setTimeout(() => {
-                if(fail) {
-                    res.send({success: false, message: 'Writing Failed'})
-                }
-            }, 2000);*/
-
         });
-
-        req.busboy.on('field', (filedname: string, value: string, ft: string, vt: string) => {
-            console.log(filedname, value);
-            if(filedname == 'project') {
-                
-                writeStream = createWriteStream(this.common.pathToProjectFolder(value) + '.zip')
-            }
-        });
-
-        req.busboy.on('finish', () => {
-            console.log('finishing');
-            fileToWrite.pipe(writeStream);
-            writeStream.on('close', () => {
-                fail = false;
-                res.send({success: true, message: 'Writing Done'});
-            });
-        })
 
         setTimeout(() => {
             if(fail) {
@@ -95,9 +72,8 @@ export class FileControllerController {
         const project = projectNameObject.name;
         const fileList = await this.common.folderContents(project);
         this.uploadQue.push({project, token});
-        
 
-        return {project: projectNameObject.name, token: suid(12), hasFiles: fileList.length > 0}
+        return {project: projectNameObject.name, token, hasFiles: fileList.length > 0}
     }
 }
 
