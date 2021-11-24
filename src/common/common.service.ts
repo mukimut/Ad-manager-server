@@ -54,15 +54,19 @@ export class CommonService {
         return path.join(approot, projectFolderName, projectName, projectName);
     }
 
-    unzip(project: string) {
+    unzip(project: string): Promise<void> {
         if(process.platform == 'win32') {
             const zipPath = path.join(approot, projectFolderName, project, project + '.zip');
-            const command = 'tar -xf "' + zipPath + '"';
-            console.log(command);
-            exec(command, (e, out: String, stderror: String) => {
-                console.log(out);
-                console.log(stderror);
+            const destinationPath = path.join(approot, projectFolderName, project);
+            const command = 'tar -xf "' + zipPath + '" -C "' + destinationPath + '"';
+            
+            return new Promise((resolve, reject) => {
+                exec(command, (e, out: String, stderror: String) => {
+                    if(e || stderror) reject('File not written');
+                    else resolve();
+                });
             })
+            
         } else {
             console.error('Unix not implemented yet')
         }

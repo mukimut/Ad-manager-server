@@ -52,9 +52,13 @@ export class FileControllerController {
 
             file.pipe(fsstream);
             fsstream.on('close', () => {
-                this.common.unzip(projectName);
-                fail = false;
-                res.send({success: true, message: 'Writing Done'});
+                this.common.unzip(projectName).then(() => {
+                    fail = false;
+                    res.send({success: true, message: 'Writing Done'});
+                }).catch(e => {
+                    res.send({success: false, message: "Writting failed"});
+                });
+                
             });
         });
 
