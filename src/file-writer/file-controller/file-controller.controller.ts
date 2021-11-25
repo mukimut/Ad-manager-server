@@ -8,6 +8,7 @@ import {suid} from 'rand-token';
  
 interface ProjectNameObject {    name: string}
 interface UploadQue{project: string, token: string}
+interface ManifestSubmission{project: string, manifest: string}
 
 @Controller()
 export class FileControllerController {
@@ -78,6 +79,17 @@ export class FileControllerController {
         this.uploadQue.push({project, token});
 
         return {project: projectNameObject.name, token, hasFiles: fileList.length > 0}
+    }
+
+    @Post('/submitManifest')
+    async submitManifest(@Body() manifestObject: ManifestSubmission): Promise<CommonResponse> {
+        try {
+            this.common.writeManifest(manifestObject.manifest, manifestObject.project);
+            return {success: true, message: 'Manifest Written'}
+        } catch(e) {
+            return {success: false, message: e}
+        }
+
     }
 }
 

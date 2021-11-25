@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
-import { readdir, mkdir } from 'fs/promises';
+import { readdir, mkdir, writeFile } from 'fs/promises';
 import {exec} from 'child_process'
+
 const approot: string = require('app-root-path').toString();
 const projectFolderName = 'ad_projects';
+const manifestFolderName = 'manifests';
 
 @Injectable()
 export class CommonService {
@@ -70,6 +72,11 @@ export class CommonService {
         } else {
             console.error('Unix not implemented yet')
         }
+    }
+
+    writeManifest(manifest: string, project: string): Promise<void> {
+        const manifestPath = path.join(manifestFolderName, project + '.json');
+        return writeFile(manifestPath, manifest, 'utf16le');
     }
 }
 

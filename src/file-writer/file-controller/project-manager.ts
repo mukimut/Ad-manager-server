@@ -4,7 +4,7 @@ import { CommonService } from 'src/common/common.service';
 
 export class ProjectManage {
     private projectRoot = 'ad_projects';
-    private approot: string = require('app-root-path').toString();;
+    private approot: string = require('app-root-path').toString();
     private projects: string[];
     private commonService: CommonService;
 
