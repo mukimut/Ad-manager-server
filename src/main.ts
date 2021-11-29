@@ -1,8 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { NextFunction, Request, Response } from 'express';
 import { AppModule } from './app.module';
+import {existsSync, mkdirSync} from 'fs';
+import * as path from 'path'
 
 async function bootstrap() {
+  const adProjectFolder = path.join(require('app-root-path').toString(), 'ad_projects');
+  if(!existsSync(adProjectFolder)) {
+    mkdirSync(adProjectFolder);
+  }
+
   const app = await NestFactory.create(AppModule);
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
